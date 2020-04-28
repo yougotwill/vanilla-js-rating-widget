@@ -1,0 +1,77 @@
+<html>
+  <head>
+    <style>
+      .rating-widget {
+        color: grey;
+      }
+      .rating-widget span.active, .rating-widget span:hover {
+        color: gold;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="js-rating-widget" class="rating-widget">
+      <span data-rating="1">★</span>
+      <span data-rating="2">★</span>
+      <span data-rating="3">★</span>
+      <span data-rating="4">★</span>
+      <span data-rating="5">★</span>
+    </div>
+  </body>
+  <script>
+    const widget = document.getElementById('js-rating-widget');
+    let storedRating = null;
+
+    const clearRating = (stars) => {
+      for (let i = 0; i < stars.length; i ++) {
+        stars[i].classList.remove('active');
+      }
+    };
+
+    const handleRating = (stars, rating, event = null, isClick = null) => {
+      if (event && event.target.tagName !== 'SPAN') {
+        if (isClick) {
+          clearRating(stars);
+          storedRating = localStorage.setItem('rating', 0);
+        }
+        return;
+      }
+      for (let i = 0; i < stars.length; i ++) {
+        if (i < rating) {
+          stars[i].classList.add('active');
+        } else {
+          stars[i].classList.remove('active');
+        }
+      }
+      if (isClick) {
+        localStorage.setItem('rating', rating);
+      }
+    };
+
+    const init = () => {
+      storedRating = localStorage.getItem('rating');
+      if (storedRating) {
+        handleRating(widget.children, storedRating);
+      }
+    };
+
+    init();
+
+    widget.addEventListener('click', (event) => {
+      handleRating(widget.children, event.target.dataset.rating, event, true);
+    });
+    
+    widget.addEventListener('mouseover', (event) => {
+      handleRating(widget.children, event.target.dataset.rating, event);
+    });
+    
+    widget.addEventListener('mouseleave', (event) => {
+      storedRating = localStorage.getItem('rating');
+      if (storedRating !== null) {
+        handleRating(widget.children, storedRating);
+      } else {
+        clearRating(widget.children);
+      }
+    });
+  </script>
+</html>
